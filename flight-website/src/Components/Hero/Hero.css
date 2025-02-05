@@ -1,0 +1,65 @@
+.hero{
+    margin: 25vh 5vw;
+}
+.hero-text{
+    color: #FFF;
+    font-size: 5vw;
+    font-weight: 500;
+    line-height: 1.2;
+}
+.hero-explore{
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    width: fit-content;
+    margin-top: 5vh;
+    padding: 0.5vw 1vw;
+    padding-left: 1.5vw;
+    border-radius: 60px;
+    background-color: white;
+    cursor: pointer;
+}
+.hero-explore img {
+    width: 3vw; /* Adjust the size as needed */
+    height: auto; /* Maintains the aspect ratio */
+}
+.hero-explore p{
+    color: #292929;
+    font-size: 1vw;
+    font-weight: 500;
+}
+.hero-dot-play{
+    margin-top: 10vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.hero-dots{
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    list-style: none;
+}
+.hero-dot{
+    width: 0.75vw;
+    height: 0.75vw;
+    background: #FFF;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.hero-dot.orange{
+    background: orangered;
+}
+.hero-play{
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+}
+.hero-play p{
+    color: #FFF;
+    font-size: 1vw;
+}
+.hero-play img {
+    width: 3vw;   /* Adjust the size of the play/pause button */
+    height: 3vw;  /* Ensure it stays proportional */
+}

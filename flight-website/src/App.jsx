@@ -4,8 +4,8 @@ import Background from "./Components/Background/Background";
 import Navbar from "./Components/Navbar/Navbar";
 import Hero from "./Components/Hero/Hero";
 import Login from "./Components/LoginForm";
-import Moments from "./pages/Moments"; // ✅ Import Moments Page
-import Chatroom from "./pages/ChatRoom"; // ✅ Import Chatroom Page
+import Moments from "./pages/Moments";
+import Chatroom from "./pages/ChatRoom";
 
 const App = () => {
   let heroData = [
@@ -54,7 +54,7 @@ const AppContent = ({
   setPlayStatus,
   seatNumber
 }) => {
-  const location = useLocation(); // ✅ Get the current page route
+  const location = useLocation(); // ✅ Get the current route
 
   return (
     <div style={{ position: "relative" }}>
@@ -71,10 +71,11 @@ const AppContent = ({
         <>
           {/* ✅ Show Background only on the home page */}
           {location.pathname === "/" && (
-            <Background playStatus={playStatus} heroCount={heroCount} />
+            <>
+              <Background playStatus={playStatus} heroCount={heroCount} />
+              <Navbar /> {/* ✅ Navbar only appears on Home Page */}
+            </>
           )}
-
-          <Navbar /> {/* ✅ Navbar is always visible after login */}
 
           <Routes>
             <Route

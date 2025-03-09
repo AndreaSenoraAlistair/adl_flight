@@ -63,14 +63,17 @@ const Moments = () => {
             return;
         }
 
+        const chatRequestData = { fromSeat: seatNumber, toSeat: inputSeat };
+        console.log("Sending Chat Request:", chatRequestData);  // ✅ Debug Log
+
         // Send chat request via WebSocket
-        socket.emit("send_chat_request", { fromSeat: seatNumber, toSeat: inputSeat });
+        socket.emit("send_chat_request", chatRequestData);
 
         // Send chat request to backend for storage
         await fetch("http://localhost:5000/api/chat/send-request", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ fromSeat: seatNumber, toSeat: inputSeat }),
+            body: JSON.stringify(chatRequestData),
         });
 
         alert(`Chat request sent to seat ${inputSeat}`);
@@ -94,13 +97,12 @@ const Moments = () => {
 
     return (
         <div style={styles.container}>
-            <h2>Moments - Seat-to-Seat Chat</h2>
+            <h2 style={styles.heading}>✈️ Moments - Seat-to-Seat Chat</h2>
 
-            <div>
-                <label>Enter seat number to chat:</label>
+            <div style={styles.inputContainer}>
                 <input
                     type="text"
-                    placeholder="Seat Number"
+                    placeholder="Enter Seat Number"
                     onChange={(e) => setInputSeat(e.target.value)}
                     value={inputSeat}
                     style={styles.input}
@@ -110,29 +112,105 @@ const Moments = () => {
                 </button>
             </div>
 
-            <h3>Incoming Chat Requests:</h3>
+            <h3 style={styles.subHeading}>Incoming Chat Requests</h3>
             {chatRequests.length > 0 ? (
                 chatRequests.map((fromSeat, index) => (
                     <div key={index} style={styles.requestBox}>
-                        <p>Chat request from Seat {fromSeat}</p>
-                        <button onClick={() => handleAcceptRequest(fromSeat)} style={styles.button}>
+                        <p>🛫 Chat request from <strong>Seat {fromSeat}</strong></p>
+                        <button onClick={() => handleAcceptRequest(fromSeat)} style={styles.acceptButton}>
                             Accept
                         </button>
                     </div>
                 ))
             ) : (
-                <p>No chat requests</p>
+                <p style={styles.noRequests}>No chat requests yet.</p>
             )}
         </div>
     );
 };
 
-// Styles
+// Styles (Dark Theme)
 const styles = {
-    container: { padding: "20px", textAlign: "center" },
-    input: { margin: "10px", padding: "8px", width: "200px" },
-    button: { padding: "8px 12px", background: "blue", color: "white", border: "none", cursor: "pointer" },
-    requestBox: { border: "1px solid #ccc", padding: "10px", margin: "10px auto", width: "300px" },
+    container: {
+        backgroundColor: "#121212",
+        color: "#E0E0E0",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+    },
+    heading: {
+        fontSize: "28px",
+        fontWeight: "bold",
+        marginBottom: "20px",
+        color: "#00bcd4",
+        textAlign: "center",
+    },
+    inputContainer: {
+        display: "flex",
+        gap: "10px",
+        marginBottom: "20px",
+    },
+    input: {
+        padding: "12px",
+        fontSize: "16px",
+        borderRadius: "8px",
+        border: "none",
+        backgroundColor: "#1E1E1E",
+        color: "#E0E0E0",
+        outline: "none",
+        width: "220px",
+        textAlign: "center",
+    },
+    button: {
+        backgroundColor: "#00bcd4",
+        color: "#121212",
+        padding: "12px 20px",
+        fontSize: "16px",
+        borderRadius: "8px",
+        border: "none",
+        cursor: "pointer",
+        transition: "0.3s ease-in-out",
+    },
+    buttonHover: {
+        backgroundColor: "#0097a7",
+    },
+    subHeading: {
+        fontSize: "20px",
+        fontWeight: "bold",
+        marginBottom: "10px",
+        color: "#f50057",
+    },
+    requestBox: {
+        backgroundColor: "#1E1E1E",
+        padding: "15px",
+        borderRadius: "10px",
+        margin: "10px 0",
+        width: "280px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        boxShadow: "0 4px 10px rgba(0, 188, 212, 0.3)",
+    },
+    acceptButton: {
+        backgroundColor: "#f50057",
+        color: "#fff",
+        border: "none",
+        padding: "8px 15px",
+        fontSize: "14px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        transition: "0.3s ease-in-out",
+    },
+    acceptButtonHover: {
+        backgroundColor: "#c51162",
+    },
+    noRequests: {
+        color: "#757575",
+        fontStyle: "italic",
+    },
 };
 
 export default Moments;

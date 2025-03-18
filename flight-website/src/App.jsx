@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import "./index.css"; // Default CSS for all pages
+import "./food.css";  // Special CSS for food-related pages
+
 import Background from "./Components/Background/Background";
-import Navbar from "./Components/Navbar/Navbar";
+import Navbar from "./Components/Navbar/Navbar";  // For Flight app
+import Navbar1 from "./Components/Navbar1/Navbar1"; // For Meals app
+import Footer from "./Components/Footer/Footer";
 import Hero from "./Components/Hero/Hero";
 import Login from "./Components/LoginForm";
 import Moments from "./pages/Moments";
 import Chatroom from "./pages/ChatRoom";
+import Home from "./pages/Home/Home";
+import Cart from "./pages/Cart/Cart";
 
 const App = () => {
   let heroData = [
@@ -27,19 +34,17 @@ const App = () => {
   }, []);
 
   return (
-    <Router>
-      <AppContent
-        isLoggedIn={isLoggedIn}
-        setIsLoggedIn={setIsLoggedIn}
-        setSeatNumber={setSeatNumber}
-        heroData={heroData}
-        heroCount={heroCount}
-        setHeroCount={setHeroCount}
-        playStatus={playStatus}
-        setPlayStatus={setPlayStatus}
-        seatNumber={seatNumber}
-      />
-    </Router>
+    <AppContent
+      isLoggedIn={isLoggedIn}
+      setIsLoggedIn={setIsLoggedIn}
+      setSeatNumber={setSeatNumber}
+      heroData={heroData}
+      heroCount={heroCount}
+      setHeroCount={setHeroCount}
+      playStatus={playStatus}
+      setPlayStatus={setPlayStatus}
+      seatNumber={seatNumber}
+    />
   );
 };
 
@@ -52,31 +57,49 @@ const AppContent = ({
   setHeroCount,
   playStatus,
   setPlayStatus,
-  seatNumber
+  seatNumber,
 }) => {
-  const location = useLocation(); // ✅ Get the current route
+  const location = useLocation();
+  const isFoodPage = location.pathname.startsWith("/home") || location.pathname.startsWith("/cart");
+
+  // Apply CSS dynamically
+  useEffect(() => {
+    if (isFoodPage) {
+      document.body.classList.add("food-style");
+    } else {
+      document.body.classList.remove("food-style");
+    }
+  }, [isFoodPage]);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="app">
       {!isLoggedIn ? (
         <Routes>
-          {/* ✅ Pass setSeatNumber to store seat info during login */}
-          <Route
-            path="/login"
-            element={<Login setIsLoggedIn={setIsLoggedIn} setSeatNumber={setSeatNumber} />}
-          />
+          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} setSeatNumber={setSeatNumber} />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       ) : (
         <>
-          {/* ✅ Show Background only on the home page */}
+          {/* ✅ Show Flight Navbar & Background on Flight Home */}
           {location.pathname === "/" && (
             <>
               <Background playStatus={playStatus} heroCount={heroCount} />
-              <Navbar /> {/* ✅ Navbar only appears on Home Page */}
+              <Navbar />
             </>
           )}
 
+          {/* ✅ Show Meals Navbar inside the wrapper */}
+          {isFoodPage && (
+            <div className="food-app">
+              <Navbar1 />
+              <Routes>
+                <Route path="/home" element={<Home />} />
+                <Route path="/cart" element={<Cart />} />
+              </Routes>
+            </div>
+          )}
+
+          {/* ✅ Flight-related Routes */}
           <Routes>
             <Route
               path="/"
@@ -90,11 +113,12 @@ const AppContent = ({
                 />
               }
             />
-            {/* ✅ Pass seatNumber to Moments & Chatroom */}
             <Route path="/moments" element={<Moments seatNumber={seatNumber} />} />
             <Route path="/chatroom" element={<Chatroom seatNumber={seatNumber} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+
+          {/* ✅ Show Footer outside the wrapper for proper styling */}
+          {isFoodPage && <Footer />}
         </>
       )}
     </div>

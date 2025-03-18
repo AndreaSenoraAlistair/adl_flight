@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Outfit", sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+
+    /* Light peach background for food pages */
+
+    /* Darker text for contrast */
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.food-app {
+    width: 80%;
+    margin: auto;
+}
+
+/* Navbar styling for food pages */
+
+
+/* Footer styling for food pages */
+.food-app .footer {
+    background-color: #ffccbc;
+    /* Custom footer color */
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

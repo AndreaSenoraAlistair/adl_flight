@@ -2,30 +2,33 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000"); // Connect to WebSocket server
+const socket = io("http://localhost:5000");
 
 const Moments = () => {
     const navigate = useNavigate();
     const [seatNumber, setSeatNumber] = useState("");
     const [chatRequests, setChatRequests] = useState([]);
     const [inputSeat, setInputSeat] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [notification, setNotification] = useState({ show: false, message: "", type: "" });
+    const [activeTab, setActiveTab] = useState("connect");
 
     useEffect(() => {
         // Retrieve seat number from localStorage
         const storedSeatNumber = localStorage.getItem("seatNumber");
         if (storedSeatNumber) {
             setSeatNumber(storedSeatNumber);
-            socket.emit("join", storedSeatNumber); // Join WebSocket room
+            socket.emit("join", storedSeatNumber);
         }
 
         // Listen for incoming chat requests
         socket.on("chat_request", ({ fromSeat }) => {
             setChatRequests((prev) => [...prev, fromSeat]);
+            showNotification(`New chat request from Seat ${fromSeat}`, "info");
         });
 
         // Listen for chat request accepted event
         socket.on("chat_request_accepted", ({ fromSeat, toSeat }) => {
-            // Navigate to chatroom with both seat numbers
             navigate(`/ChatRoom?seat1=${toSeat}&seat2=${fromSeat}`);
         });
 
@@ -33,7 +36,12 @@ const Moments = () => {
             socket.off("chat_request");
             socket.off("chat_request_accepted");
         };
-    }, []);
+    }, [navigate]);
+
+    const showNotification = (message, type) => {
+        setNotification({ show: true, message, type });
+        setTimeout(() => setNotification({ show: false, message: "", type: "" }), 3000);
+    };
 
     // Function to check if seat number exists in DB
     const checkSeatNumber = async (seat) => {
@@ -42,7 +50,7 @@ const Moments = () => {
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
-            return data.exists; // True if seat exists, false otherwise
+            return data.exists;
         } catch (error) {
             console.error("Error checking seat:", error);
             return false;
@@ -52,32 +60,46 @@ const Moments = () => {
     // Function to send chat request
     const handleSendRequest = async () => {
         if (!inputSeat.trim()) {
-            alert("Please enter a valid seat number.");
+            showNotification("Please enter a valid seat number", "error");
             return;
         }
 
+        if (inputSeat === seatNumber) {
+            showNotification("You cannot send a request to yourself", "error");
+            return;
+        }
+
+        setLoading(true);
         const isValidSeat = await checkSeatNumber(inputSeat);
 
         if (!isValidSeat) {
-            alert("Invalid seat number. The user may not be logged in.");
+            showNotification("Invalid seat number. The user may not be logged in", "error");
+            setLoading(false);
             return;
         }
 
         const chatRequestData = { fromSeat: seatNumber, toSeat: inputSeat };
-        console.log("Sending Chat Request:", chatRequestData);  // ✅ Debug Log
+        console.log("Sending Chat Request:", chatRequestData);
 
         // Send chat request via WebSocket
         socket.emit("send_chat_request", chatRequestData);
 
         // Send chat request to backend for storage
-        await fetch("http://localhost:5000/api/chat/send-request", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(chatRequestData),
-        });
+        try {
+            await fetch("http://localhost:5000/api/chat/send-request", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(chatRequestData),
+            });
 
-        alert(`Chat request sent to seat ${inputSeat}`);
-        setInputSeat(""); // Clear input field
+            showNotification(`Chat request sent to seat ${inputSeat}`, "success");
+            setInputSeat("");
+        } catch (error) {
+            showNotification("Failed to send request. Please try again", "error");
+            console.error("Error sending request:", error);
+        }
+        
+        setLoading(false);
     };
 
     // Function to accept chat request
@@ -96,120 +118,439 @@ const Moments = () => {
     };
 
     return (
-        <div style={styles.container}>
-            <h2 style={styles.heading}>✈️ Moments - Seat-to-Seat Chat</h2>
-
-            <div style={styles.inputContainer}>
-                <input
-                    type="text"
-                    placeholder="Enter Seat Number"
-                    onChange={(e) => setInputSeat(e.target.value)}
-                    value={inputSeat}
-                    style={styles.input}
-                />
-                <button onClick={handleSendRequest} style={styles.button}>
-                    Send Request
-                </button>
+        <div style={styles.pageContainer}>
+            {/* Header */}
+            <div style={styles.header}>
+                <div style={styles.logo}>✈️ SkyConnect</div>
+                <div style={styles.userInfo}>
+                    <div style={styles.seatBadge}>Seat {seatNumber}</div>
+                </div>
             </div>
 
-            <h3 style={styles.subHeading}>Incoming Chat Requests</h3>
-            {chatRequests.length > 0 ? (
-                chatRequests.map((fromSeat, index) => (
-                    <div key={index} style={styles.requestBox}>
-                        <p>🛫 Chat request from <strong>Seat {fromSeat}</strong></p>
-                        <button onClick={() => handleAcceptRequest(fromSeat)} style={styles.acceptButton}>
-                            Accept
-                        </button>
+            {/* Main Content */}
+            <div style={styles.contentContainer}>
+                {/* Left Sidebar */}
+                <div style={styles.sidebar}>
+                    <div 
+                        style={{...styles.sidebarItem, ...(activeTab === "connect" ? styles.activeSidebarItem : {})}} 
+                        onClick={() => setActiveTab("connect")}
+                    >
+                        <span style={styles.sidebarIcon}>🔗</span>
+                        <span>Connect</span>
                     </div>
-                ))
-            ) : (
-                <p style={styles.noRequests}>No chat requests yet.</p>
+                    <div 
+                        style={{...styles.sidebarItem, ...(activeTab === "requests" ? styles.activeSidebarItem : {})}} 
+                        onClick={() => setActiveTab("requests")}
+                    >
+                        <span style={styles.sidebarIcon}>📩</span>
+                        <span>Requests</span>
+                        {chatRequests.length > 0 && (
+                            <span style={styles.badgeCounter}>{chatRequests.length}</span>
+                        )}
+                    </div>
+                    <div style={styles.sidebarItem}>
+                        <span style={styles.sidebarIcon}>👥</span>
+                        <span>Activities</span>
+                    </div>
+                    <div style={styles.sidebarItem}>
+                        <span style={styles.sidebarIcon}>⚙️</span>
+                        <span>Settings</span>
+                    </div>
+                </div>
+
+                {/* Main Area */}
+                <div style={styles.mainContent}>
+                    {activeTab === "connect" && (
+                        <div style={styles.connectTab}>
+                            <h2 style={styles.heading}>Connect with a Fellow Traveler</h2>
+                            <p style={styles.subtext}>
+                                Enter the seat number of the passenger you'd like to chat with.
+                            </p>
+
+                            <div style={styles.inputCardContainer}>
+                                <div style={styles.inputCard}>
+                                    <div style={styles.cardIcon}>🪑</div>
+                                    <div style={styles.cardContent}>
+                                        <label style={styles.inputLabel}>Seat Number</label>
+                                        <div style={styles.inputRow}>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. 24A"
+                                                value={inputSeat}
+                                                onChange={(e) => setInputSeat(e.target.value)}
+                                                style={styles.input}
+                                            />
+                                            <button 
+                                                onClick={handleSendRequest} 
+                                                disabled={loading}
+                                                style={loading ? {...styles.button, ...styles.buttonDisabled} : styles.button}
+                                            >
+                                                {loading ? "Sending..." : "Send Request"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style={styles.infoSection}>
+                                <h3 style={styles.infoTitle}>Tips for a great connection</h3>
+                                <ul style={styles.tipsList}>
+                                    <li>Introduce yourself and share your travel purpose</li>
+                                    <li>Ask about their destination and recommendations</li>
+                                    <li>Share travel experiences or tips</li>
+                                    <li>Be respectful of privacy and boundaries</li>
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === "requests" && (
+                        <div style={styles.requestsTab}>
+                            <h2 style={styles.heading}>Incoming Chat Requests</h2>
+                            <p style={styles.subtext}>
+                                Passengers who would like to connect with you during the flight.
+                            </p>
+
+                            <div style={styles.requestsList}>
+                                {chatRequests.length > 0 ? (
+                                    chatRequests.map((fromSeat, index) => (
+                                        <div key={index} style={styles.requestCard}>
+                                            <div style={styles.requestInfo}>
+                                                <div style={styles.requestSeatIcon}>🪑</div>
+                                                <div>
+                                                    <h4 style={styles.requestSeatNumber}>Seat {fromSeat}</h4>
+                                                    <p style={styles.requestText}>would like to chat with you</p>
+                                                </div>
+                                            </div>
+                                            <div style={styles.requestActions}>
+                                                <button 
+                                                    onClick={() => handleAcceptRequest(fromSeat)} 
+                                                    style={styles.acceptButton}
+                                                >
+                                                    Accept
+                                                </button>
+                                                <button 
+                                                    style={styles.declineButton}
+                                                    onClick={() => {
+                                                        setChatRequests(prev => prev.filter(seat => seat !== fromSeat));
+                                                        showNotification("Request declined", "info");
+                                                    }}
+                                                >
+                                                    Decline
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div style={styles.emptyState}>
+                                        <div style={styles.emptyIcon}>📭</div>
+                                        <p style={styles.emptyText}>No chat requests yet</p>
+                                        <p style={styles.emptySubtext}>
+                                            When fellow passengers send you a request, it will appear here
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Notification */}
+            {notification.show && (
+                <div style={{
+                    ...styles.notification,
+                    backgroundColor: notification.type === "error" ? "#FEE2E2" : 
+                                     notification.type === "success" ? "#ECFDF5" : "#E0F2FE"
+                }}>
+                    <span style={{
+                        ...styles.notificationIcon,
+                        color: notification.type === "error" ? "#EF4444" : 
+                              notification.type === "success" ? "#10B981" : "#3B82F6"
+                    }}>
+                        {notification.type === "error" ? "❌" : 
+                         notification.type === "success" ? "✅" : "ℹ️"}
+                    </span>
+                    <span style={styles.notificationText}>{notification.message}</span>
+                </div>
             )}
         </div>
     );
 };
 
-// Styles (Dark Theme)
+// Enhanced Styles
 const styles = {
-    container: {
-        backgroundColor: "#121212",
-        color: "#E0E0E0",
+    pageContainer: {
+        backgroundColor: "#F9FAFB",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "20px",
     },
-    heading: {
-        fontSize: "28px",
-        fontWeight: "bold",
-        marginBottom: "20px",
-        color: "#00bcd4",
-        textAlign: "center",
-    },
-    inputContainer: {
-        display: "flex",
-        gap: "10px",
-        marginBottom: "20px",
-    },
-    input: {
-        padding: "12px",
-        fontSize: "16px",
-        borderRadius: "8px",
-        border: "none",
-        backgroundColor: "#1E1E1E",
-        color: "#E0E0E0",
-        outline: "none",
-        width: "220px",
-        textAlign: "center",
-    },
-    button: {
-        backgroundColor: "#00bcd4",
-        color: "#121212",
-        padding: "12px 20px",
-        fontSize: "16px",
-        borderRadius: "8px",
-        border: "none",
-        cursor: "pointer",
-        transition: "0.3s ease-in-out",
-    },
-    buttonHover: {
-        backgroundColor: "#0097a7",
-    },
-    subHeading: {
-        fontSize: "20px",
-        fontWeight: "bold",
-        marginBottom: "10px",
-        color: "#f50057",
-    },
-    requestBox: {
-        backgroundColor: "#1E1E1E",
-        padding: "15px",
-        borderRadius: "10px",
-        margin: "10px 0",
-        width: "280px",
+    header: {
+        backgroundColor: "#FFFFFF",
+        padding: "1rem 2rem",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        boxShadow: "0 4px 10px rgba(0, 188, 212, 0.3)",
+        borderBottom: "1px solid #E5E7EB",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+    },
+    logo: {
+        fontSize: "1.5rem",
+        fontWeight: "bold",
+        color: "#1F2937",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5rem",
+    },
+    userInfo: {
+        display: "flex",
+        alignItems: "center",
+        gap: "1rem",
+    },
+    seatBadge: {
+        backgroundColor: "#6D28D9",
+        color: "white",
+        padding: "0.5rem 1rem",
+        borderRadius: "9999px",
+        fontWeight: "medium",
+        fontSize: "0.875rem",
+    },
+    contentContainer: {
+        display: "flex",
+        flex: "1",
+    },
+    sidebar: {
+        width: "240px",
+        backgroundColor: "#FFFFFF",
+        padding: "2rem 0",
+        borderRight: "1px solid #E5E7EB",
+    },
+    sidebarItem: {
+        display: "flex",
+        alignItems: "center",
+        gap: "0.75rem",
+        padding: "0.75rem 1.5rem",
+        color: "#4B5563",
+        cursor: "pointer",
+        position: "relative",
+        fontSize: "1rem",
+        transition: "background-color 0.2s, color 0.2s",
+    },
+    activeSidebarItem: {
+        backgroundColor: "#F3E8FF",
+        color: "#6D28D9",
+        borderRight: "3px solid #6D28D9",
+    },
+    sidebarIcon: {
+        fontSize: "1.25rem",
+    },
+    badgeCounter: {
+        position: "absolute",
+        right: "1.5rem",
+        backgroundColor: "#EF4444",
+        color: "white",
+        borderRadius: "9999px",
+        fontSize: "0.75rem",
+        fontWeight: "bold",
+        minWidth: "1.25rem",
+        height: "1.25rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 0.25rem",
+    },
+    mainContent: {
+        flex: "1",
+        padding: "2rem",
+        backgroundColor: "#F9FAFB",
+        overflowY: "auto",
+    },
+    heading: {
+        fontSize: "1.5rem",
+        fontWeight: "bold",
+        color: "#1F2937",
+        marginBottom: "0.5rem",
+    },
+    subtext: {
+        color: "#6B7280",
+        marginBottom: "2rem",
+    },
+    inputCardContainer: {
+        marginBottom: "2rem",
+    },
+    inputCard: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: "0.5rem",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+        padding: "1.5rem",
+        display: "flex",
+        alignItems: "center",
+        gap: "1.5rem",
+    },
+    cardIcon: {
+        fontSize: "2rem",
+    },
+    cardContent: {
+        flex: "1",
+    },
+    inputLabel: {
+        display: "block",
+        fontSize: "0.875rem",
+        fontWeight: "500",
+        color: "#4B5563",
+        marginBottom: "0.5rem",
+    },
+    inputRow: {
+        display: "flex",
+        gap: "1rem",
+    },
+    input: {
+        flex: "1",
+        padding: "0.75rem 1rem",
+        borderRadius: "0.375rem",
+        border: "1px solid #D1D5DB",
+        fontSize: "1rem",
+        color: "#1F2937",
+        outline: "none",
+        transition: "border-color 0.2s",
+    },
+    button: {
+        backgroundColor: "#6D28D9",
+        color: "white",
+        border: "none",
+        borderRadius: "0.375rem",
+        padding: "0.75rem 1.5rem",
+        fontSize: "1rem",
+        fontWeight: "500",
+        cursor: "pointer",
+        transition: "background-color 0.2s",
+    },
+    buttonDisabled: {
+        backgroundColor: "#9CA3AF",
+        cursor: "not-allowed",
+    },
+    infoSection: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: "0.5rem",
+        padding: "1.5rem",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+    },
+    infoTitle: {
+        fontSize: "1.125rem",
+        fontWeight: "medium",
+        color: "#1F2937",
+        marginBottom: "1rem",
+    },
+    tipsList: {
+        paddingLeft: "1.5rem",
+        color: "#4B5563",
+    },
+    requestsList: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+    },
+    requestCard: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: "0.5rem",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+        padding: "1.5rem",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    requestInfo: {
+        display: "flex",
+        alignItems: "center",
+        gap: "1rem",
+    },
+    requestSeatIcon: {
+        fontSize: "1.5rem",
+        backgroundColor: "#F3E8FF",
+        color: "#6D28D9",
+        width: "3rem",
+        height: "3rem",
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    requestSeatNumber: {
+        fontSize: "1.125rem",
+        fontWeight: "medium",
+        color: "#1F2937",
+        margin: "0 0 0.25rem 0",
+    },
+    requestText: {
+        color: "#6B7280",
+        margin: 0,
+    },
+    requestActions: {
+        display: "flex",
+        gap: "0.75rem",
     },
     acceptButton: {
-        backgroundColor: "#f50057",
-        color: "#fff",
+        backgroundColor: "#6D28D9",
+        color: "white",
         border: "none",
-        padding: "8px 15px",
-        fontSize: "14px",
-        borderRadius: "8px",
+        borderRadius: "0.375rem",
+        padding: "0.5rem 1rem",
+        fontSize: "0.875rem",
+        fontWeight: "500",
         cursor: "pointer",
-        transition: "0.3s ease-in-out",
+        transition: "background-color 0.2s",
     },
-    acceptButtonHover: {
-        backgroundColor: "#c51162",
+    declineButton: {
+        backgroundColor: "transparent",
+        color: "#6B7280",
+        border: "1px solid #D1D5DB",
+        borderRadius: "0.375rem",
+        padding: "0.5rem 1rem",
+        fontSize: "0.875rem",
+        fontWeight: "500",
+        cursor: "pointer",
+        transition: "background-color 0.2s, color 0.2s",
     },
-    noRequests: {
-        color: "#757575",
-        fontStyle: "italic",
+    emptyState: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "3rem 0",
+        color: "#6B7280",
+    },
+    emptyIcon: {
+        fontSize: "3rem",
+        marginBottom: "1rem",
+    },
+    emptyText: {
+        fontSize: "1.125rem",
+        fontWeight: "medium",
+        margin: "0 0 0.5rem 0",
+    },
+    emptySubtext: {
+        color: "#9CA3AF",
+        textAlign: "center",
+        maxWidth: "300px",
+    },
+    notification: {
+        position: "fixed",
+        bottom: "2rem",
+        right: "2rem",
+        padding: "1rem 1.5rem",
+        borderRadius: "0.5rem",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.75rem",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        maxWidth: "400px",
+        zIndex: 100,
+    },
+    notificationIcon: {
+        fontSize: "1.25rem",
+    },
+    notificationText: {
+        color: "#1F2937",
     },
 };
 

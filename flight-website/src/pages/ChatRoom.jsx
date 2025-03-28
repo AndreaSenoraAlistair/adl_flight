@@ -55,7 +55,7 @@ const ChatRoom = () => {
 
     const handleTyping = (e) => {
         setMessage(e.target.value);
-        
+
         // Emit typing event
         const roomName = [seat1, seat2].sort().join("-");
         socket.emit("typing", {
@@ -104,11 +104,22 @@ const ChatRoom = () => {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
+    // Generate avatar color based on seat number
+    const getAvatarColor = (seatNum) => {
+        const colors = ["#4F46E5", "#7C3AED", "#EC4899", "#F59E0B", "#10B981"];
+        return colors[parseInt(seatNum) % colors.length];
+    };
+
+    const otherSeatColor = getAvatarColor(otherSeat);
+    const mySeatColor = getAvatarColor(mySeat);
+
     return (
         <div style={styles.container}>
             <header style={styles.header}>
                 <div style={styles.avatarContainer}>
-                    <div style={styles.avatar}>{otherSeat}</div>
+                    <div style={{ ...styles.avatar, backgroundColor: otherSeatColor }}>
+                        <span style={styles.avatarText}>{otherSeat}</span>
+                    </div>
                 </div>
                 <div style={styles.headerInfo}>
                     <h2 style={styles.headerTitle}>Seat {otherSeat}</h2>
@@ -122,31 +133,49 @@ const ChatRoom = () => {
                         <p>No messages yet. Say hello! 👋</p>
                     </div>
                 )}
-                
+
                 {messages.map((msg, index) => {
                     const isMe = msg.fromSeat === mySeat;
                     const showAvatar = index === 0 || messages[index - 1]?.fromSeat !== msg.fromSeat;
-                    
+                    const seatColor = isMe ? mySeatColor : otherSeatColor;
+
                     return (
                         <div key={index} style={{
                             ...styles.messageRow,
-                            justifyContent: isMe ? "flex-end" : "flex-start"
+                            justifyContent: isMe ? "flex-end" : "flex-start",
+                            marginBottom: "12px"
                         }}>
                             {!isMe && showAvatar && (
-                                <div style={styles.messageAvatar}>{msg.fromSeat}</div>
+                                <div style={{ ...styles.messageAvatar, backgroundColor: seatColor }}>
+                                    {msg.fromSeat}
+                                </div>
                             )}
-                            
+
                             <div style={{
                                 ...styles.messageBubble,
-                                backgroundColor: isMe ? "#0A84FF" : "#323232",
-                                borderBottomLeftRadius: !isMe && !showAvatar ? 4 : 18,
-                                borderBottomRightRadius: isMe && !showAvatar ? 4 : 18,
-                                borderTopLeftRadius: 18,
-                                borderTopRightRadius: 18,
+                                backgroundColor: isMe ? seatColor : "#E9EDF0",
+                                color: isMe ? "#FFFFFF" : "#333333",
+                                borderBottomLeftRadius: !isMe && !showAvatar ? 8 : 20,
+                                borderBottomRightRadius: isMe && !showAvatar ? 8 : 20,
+                                borderTopLeftRadius: isMe ? 20 : (showAvatar ? 4 : 20),
+                                borderTopRightRadius: !isMe ? 20 : (showAvatar ? 4 : 20),
+                                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+                                border: isMe ? "none" : "1px solid #D1D9E0"
                             }}>
                                 <div style={styles.messageText}>{msg.message}</div>
-                                <div style={styles.messageTime}>{formatTime(msg.timestamp)}</div>
+                                <div style={{
+                                    ...styles.messageTime,
+                                    color: isMe ? "rgba(255, 255, 255, 0.8)" : "#666666"
+                                }}>
+                                    {formatTime(msg.timestamp)}
+                                </div>
                             </div>
+
+                            {isMe && showAvatar && (
+                                <div style={{ ...styles.messageAvatar, backgroundColor: seatColor }}>
+                                    {msg.fromSeat}
+                                </div>
+                            )}
                         </div>
                     );
                 })}
@@ -159,14 +188,15 @@ const ChatRoom = () => {
                     value={message}
                     onChange={handleTyping}
                     onKeyPress={handleKeyPress}
-                    placeholder="Message..."
+                    placeholder="Type a message..."
                     style={styles.input}
                 />
-                <button 
-                    onClick={sendMessage} 
+                <button
+                    onClick={sendMessage}
                     style={{
                         ...styles.button,
-                        opacity: message.trim() ? 1 : 0.5,
+                        backgroundColor: mySeatColor,
+                        opacity: message.trim() ? 1 : 0.7,
                     }}
                     disabled={!message.trim()}
                 >
@@ -182,28 +212,34 @@ const styles = {
         display: "flex",
         flexDirection: "column",
         height: "100vh",
-        backgroundColor: "#171717",
-        color: "#fff",
+        backgroundColor: "#F5F7FA",
+        color: "#333333",
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     },
     header: {
         display: "flex",
         alignItems: "center",
-        padding: "12px 16px",
-        borderBottom: "1px solid #2C2C2C",
-        backgroundColor: "#1A1A1A",
+        padding: "16px 20px",
+        borderBottom: "1px solid #D1D9E0",
+        backgroundColor: "#FFFFFF",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
     },
     avatarContainer: {
-        marginRight: "12px",
+        marginRight: "14px",
     },
     avatar: {
-        width: "40px",
-        height: "40px",
+        width: "44px",
+        height: "44px",
         borderRadius: "50%",
-        backgroundColor: "#0A84FF",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontWeight: "bold",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    avatarText: {
+        color: "#FFFFFF",
+        fontSize: "16px",
     },
     headerInfo: {
         flex: 1,
@@ -211,20 +247,22 @@ const styles = {
     headerTitle: {
         margin: 0,
         fontSize: "18px",
-        fontWeight: "500",
+        fontWeight: "600",
+        color: "#333333",
     },
     typing: {
         fontSize: "12px",
-        color: "#8E8E93",
-        marginTop: "2px",
+        color: "#666666",
+        marginTop: "4px",
+        fontStyle: "italic",
     },
     chatBox: {
         flex: 1,
         overflowY: "auto",
-        padding: "16px",
+        padding: "20px",
         display: "flex",
         flexDirection: "column",
-        gap: "8px",
+        backgroundColor: "#F5F7FA",
     },
     emptyState: {
         display: "flex",
@@ -232,69 +270,72 @@ const styles = {
         alignItems: "center",
         justifyContent: "center",
         height: "100%",
-        color: "#8E8E93",
+        color: "#666666",
         textAlign: "center",
+        fontSize: "16px",
     },
     messageRow: {
         display: "flex",
         alignItems: "flex-end",
-        marginBottom: "2px",
+        marginBottom: "4px",
     },
     messageAvatar: {
         width: "28px",
         height: "28px",
         borderRadius: "50%",
-        backgroundColor: "#2C2C2C",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: "12px",
-        marginRight: "8px",
+        color: "#FFFFFF",
+        margin: "0 8px",
     },
     messageBubble: {
-        padding: "10px 14px",
+        padding: "12px 16px",
         maxWidth: "70%",
         position: "relative",
+        wordWrap: "break-word",
     },
     messageText: {
         fontSize: "15px",
         lineHeight: "1.4",
         wordBreak: "break-word",
+        fontWeight: "400",
     },
     messageTime: {
-        fontSize: "10px",
-        color: "rgba(255, 255, 255, 0.6)",
+        fontSize: "11px",
         textAlign: "right",
-        marginTop: "4px",
+        marginTop: "5px",
     },
     inputContainer: {
         display: "flex",
         alignItems: "center",
-        padding: "12px 16px",
-        borderTop: "1px solid #2C2C2C",
-        backgroundColor: "#1A1A1A",
+        padding: "16px 20px",
+        borderTop: "1px solid #D1D9E0",
+        backgroundColor: "#FFFFFF",
     },
     input: {
         flex: 1,
         padding: "12px 16px",
         borderRadius: "24px",
-        border: "none",
-        backgroundColor: "#2C2C2C",
-        color: "#fff",
+        border: "1px solid #D1D9E0",
+        backgroundColor: "#FFFFFF",
+        color: "#333333",
         outline: "none",
         fontSize: "15px",
+        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
     },
     button: {
-        marginLeft: "10px",
-        padding: "8px 16px",
-        backgroundColor: "#0A84FF",
+        marginLeft: "12px",
+        padding: "10px 18px",
         border: "none",
         borderRadius: "20px",
-        color: "#fff",
-        fontWeight: "500",
+        color: "#FFFFFF",
+        fontWeight: "600",
         cursor: "pointer",
         fontSize: "15px",
-        transition: "opacity 0.2s",
+        transition: "all 0.2s ease",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
     },
 };
 

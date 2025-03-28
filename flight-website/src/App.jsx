@@ -62,12 +62,12 @@ const AppContent = ({
   const location = useLocation();
   const isFoodPage = location.pathname.startsWith("/home") || location.pathname.startsWith("/cart");
 
-  // Apply CSS dynamically
+  // ✅ Apply scroll logic dynamically based on the page
   useEffect(() => {
     if (isFoodPage) {
-      document.body.classList.add("food-style");
+      document.body.style.overflow = "auto";  // Enable scrolling
     } else {
-      document.body.classList.remove("food-style");
+      document.body.style.overflow = "hidden"; // Disable scrolling
     }
   }, [isFoodPage]);
 

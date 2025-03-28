@@ -43,6 +43,82 @@ const LoginForm = ({ setIsLoggedIn }) => {
         }
     };
 
+    // Media query style for responsiveness
+    const getResponsiveStyle = (mobileStyle, desktopStyle) => {
+        return window.innerWidth < 768 ? mobileStyle : desktopStyle;
+    };
+
+    // Responsive page container style
+    const pageContainerStyle = {
+        ...getResponsiveStyle(
+            { 
+                display: "flex", 
+                flexDirection: "column", 
+                minHeight: "100vh", 
+                width: "100%", 
+                background: "#F9FAFB" 
+            },
+            { 
+                display: "flex", 
+                flexDirection: "row", 
+                minHeight: "100vh", 
+                width: "100%", 
+                backgroundColor: "#F9FAFB" 
+            }
+        )
+    };
+
+    // Responsive image container style
+    const imageContainerStyle = {
+        ...getResponsiveStyle(
+            { 
+                display: "none" 
+            },
+            {
+                flex: "1",
+                background:"url('/fallback.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+            }
+        )
+    };
+
+    // Responsive form container style
+    const formContainerStyle = {
+        ...getResponsiveStyle(
+            {
+                flex: "1",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "1rem",
+                backgroundColor: "#FFFFFF",
+                width: "100%",
+            },
+            {
+                flex: "1",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "2rem",
+                backgroundColor: "#FFFFFF",
+            }
+        )
+    };
+
+    // Responsive form wrapper style
+    const formWrapperStyle = {
+        width: "100%",
+        maxWidth: "450px",
+        padding: getResponsiveStyle("1rem", "2rem"),
+    };
+
     return (
         <div style={pageContainerStyle}>
             {/* Left side - decorative image */}
@@ -77,7 +153,10 @@ const LoginForm = ({ setIsLoggedIn }) => {
                                 value={formData.fullName} 
                                 onChange={handleChange} 
                                 required 
-                                style={inputStyle} 
+                                style={{
+                                    ...inputStyle,
+                                    width: getResponsiveStyle("100%", "100%")
+                                }} 
                                 placeholder="Enter your full name"
                             />
                         </div>
@@ -90,13 +169,23 @@ const LoginForm = ({ setIsLoggedIn }) => {
                                 value={formData.seatNumber} 
                                 onChange={handleChange} 
                                 required 
-                                style={inputStyle} 
+                                style={{
+                                    ...inputStyle,
+                                    width: getResponsiveStyle("100%", "100%")
+                                }} 
                                 placeholder="e.g. 24A"
                             />
                         </div>
 
-                        <div style={rowContainerStyle}>
-                            <div style={halfInputGroupStyle}>
+                        <div style={{
+                            ...rowContainerStyle,
+                            flexDirection: getResponsiveStyle("column", "row")
+                        }}>
+                            <div style={{
+                                ...halfInputGroupStyle,
+                                width: getResponsiveStyle("100%", "50%"),
+                                marginBottom: getResponsiveStyle("1rem", "0")
+                            }}>
                                 <label style={labelStyle}>From</label>
                                 <input 
                                     type="text" 
@@ -104,11 +193,17 @@ const LoginForm = ({ setIsLoggedIn }) => {
                                     value={formData.source} 
                                     onChange={handleChange} 
                                     required 
-                                    style={inputStyle} 
+                                    style={{
+                                        ...inputStyle,
+                                        width: "100%"
+                                    }} 
                                     placeholder="e.g. NYC"
                                 />
                             </div>
-                            <div style={halfInputGroupStyle}>
+                            <div style={{
+                                ...halfInputGroupStyle,
+                                width: getResponsiveStyle("100%", "50%")
+                            }}>
                                 <label style={labelStyle}>To</label>
                                 <input 
                                     type="text" 
@@ -116,7 +211,10 @@ const LoginForm = ({ setIsLoggedIn }) => {
                                     value={formData.destination} 
                                     onChange={handleChange} 
                                     required 
-                                    style={inputStyle} 
+                                    style={{
+                                        ...inputStyle,
+                                        width: "100%"
+                                    }} 
                                     placeholder="e.g. SFO"
                                 />
                             </div>
@@ -141,26 +239,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
     );
 };
 
-// Enhanced styling
-const pageContainerStyle = {
-    display: "flex",
-    flexDirection: "row",
-    minHeight: "100vh",
-    width: "100%",
-    backgroundColor: "#F9FAFB",
-};
-
-const imageContainerStyle = {
-    flex: "1",
-    backgroundImage: "url('https://source.unsplash.com/random/1200x900/?airplane,travel')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-};
-
+// Keep all existing style objects from the original component
 const overlayStyle = {
     position: "absolute",
     top: 0,
@@ -192,26 +271,10 @@ const taglineStyle = {
     textShadow: "1px 1px 2px rgba(0, 0, 0, 0.5)",
 };
 
-const formContainerStyle = {
-    flex: "1",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "2rem",
-    backgroundColor: "#FFFFFF",
-};
-
-const formWrapperStyle = {
-    width: "100%",
-    maxWidth: "450px",
-    padding: "2rem",
-};
-
 const logoContainerStyle = {
     display: "flex",
     alignItems: "center",
-    marginBottom: "2rem",
+    marginBottom: "1rem",
 };
 
 const logoStyle = {
@@ -230,12 +293,12 @@ const headingStyle = {
     color: "#1F2937",
     fontSize: "2rem",
     fontWeight: "bold",
-    marginBottom: "0.5rem",
+    marginBottom: "0.25rem",
 };
 
 const subheadingStyle = {
     color: "#6B7280",
-    marginBottom: "2rem",
+    marginBottom: "1rem",
 };
 
 const formStyle = {

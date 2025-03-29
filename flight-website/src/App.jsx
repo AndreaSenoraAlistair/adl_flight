@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import "./index.css"; // Default CSS for all pages
 import "./food.css";  // Special CSS for food-related pages
 
-import Background from "./Components/Background/Background";
+// import Background from "./Components/Background/Background";
 import Navbar from "./Components/Navbar/Navbar";  // For Flight app
 import Navbar1 from "./Components/Navbar1/Navbar1"; // For Meals app
 import Footer from "./Components/Footer/Footer";
@@ -67,7 +67,7 @@ const AppContent = ({
     if (isFoodPage) {
       document.body.style.overflow = "auto";  // Enable scrolling
     } else {
-      document.body.style.overflow = "hidden"; // Disable scrolling
+      document.body.style.overflow = "auto"; // Disable scrolling
     }
   }, [isFoodPage]);
 
@@ -83,8 +83,9 @@ const AppContent = ({
           {/* ✅ Show Flight Navbar & Background on Flight Home */}
           {location.pathname === "/" && (
             <>
-              <Background playStatus={playStatus} heroCount={heroCount} />
-              <Navbar />
+            {Hero}
+              {/* <Background playStatus={playStatus} heroCount={heroCount} /> */}
+              {/* <Navbar /> */}
             </>
           )}
 

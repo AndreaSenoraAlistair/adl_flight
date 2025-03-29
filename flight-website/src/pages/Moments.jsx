@@ -98,7 +98,7 @@ const Moments = () => {
             showNotification("Failed to send request. Please try again", "error");
             console.error("Error sending request:", error);
         }
-        
+
         setLoading(false);
     };
 
@@ -129,32 +129,61 @@ const Moments = () => {
 
             {/* Main Content */}
             <div style={styles.contentContainer}>
-                {/* Left Sidebar */}
+                {/* Left Sidebar - Hidden on mobile, shown as bottom nav on mobile */}
                 <div style={styles.sidebar}>
-                    <div 
-                        style={{...styles.sidebarItem, ...(activeTab === "connect" ? styles.activeSidebarItem : {})}} 
+                    <div
+                        style={{ ...styles.sidebarItem, ...(activeTab === "connect" ? styles.activeSidebarItem : {}) }}
                         onClick={() => setActiveTab("connect")}
                     >
                         <span style={styles.sidebarIcon}>🔗</span>
-                        <span>Connect</span>
+                        <span style={styles.sidebarText}>Connect</span>
                     </div>
-                    <div 
-                        style={{...styles.sidebarItem, ...(activeTab === "requests" ? styles.activeSidebarItem : {})}} 
+                    <div
+                        style={{ ...styles.sidebarItem, ...(activeTab === "requests" ? styles.activeSidebarItem : {}) }}
                         onClick={() => setActiveTab("requests")}
                     >
                         <span style={styles.sidebarIcon}>📩</span>
-                        <span>Requests</span>
+                        <span style={styles.sidebarText}>Requests</span>
                         {chatRequests.length > 0 && (
                             <span style={styles.badgeCounter}>{chatRequests.length}</span>
                         )}
                     </div>
                     <div style={styles.sidebarItem}>
                         <span style={styles.sidebarIcon}>👥</span>
-                        <span>Activities</span>
+                        <span style={styles.sidebarText}>Activities</span>
                     </div>
                     <div style={styles.sidebarItem}>
                         <span style={styles.sidebarIcon}>⚙️</span>
-                        <span>Settings</span>
+                        <span style={styles.sidebarText}>Settings</span>
+                    </div>
+                </div>
+
+                {/* Mobile Bottom Navigation */}
+                <div style={styles.mobileNav}>
+                    <div
+                        style={{ ...styles.mobileNavItem, ...(activeTab === "connect" ? styles.activeMobileNavItem : {}) }}
+                        onClick={() => setActiveTab("connect")}
+                    >
+                        <span style={styles.mobileNavIcon}>🔗</span>
+                        <span style={styles.mobileNavText}>Connect</span>
+                    </div>
+                    <div
+                        style={{ ...styles.mobileNavItem, ...(activeTab === "requests" ? styles.activeMobileNavItem : {}) }}
+                        onClick={() => setActiveTab("requests")}
+                    >
+                        <span style={styles.mobileNavIcon}>📩</span>
+                        {chatRequests.length > 0 && (
+                            <span style={styles.mobileBadgeCounter}>{chatRequests.length}</span>
+                        )}
+                        <span style={styles.mobileNavText}>Requests</span>
+                    </div>
+                    <div style={styles.mobileNavItem}>
+                        <span style={styles.mobileNavIcon}>👥</span>
+                        <span style={styles.mobileNavText}>Activities</span>
+                    </div>
+                    <div style={styles.mobileNavItem}>
+                        <span style={styles.mobileNavIcon}>⚙️</span>
+                        <span style={styles.mobileNavText}>Settings</span>
                     </div>
                 </div>
 
@@ -180,10 +209,10 @@ const Moments = () => {
                                                 onChange={(e) => setInputSeat(e.target.value)}
                                                 style={styles.input}
                                             />
-                                            <button 
-                                                onClick={handleSendRequest} 
+                                            <button
+                                                onClick={handleSendRequest}
                                                 disabled={loading}
-                                                style={loading ? {...styles.button, ...styles.buttonDisabled} : styles.button}
+                                                style={loading ? { ...styles.button, ...styles.buttonDisabled } : styles.button}
                                             >
                                                 {loading ? "Sending..." : "Send Request"}
                                             </button>
@@ -223,13 +252,13 @@ const Moments = () => {
                                                 </div>
                                             </div>
                                             <div style={styles.requestActions}>
-                                                <button 
-                                                    onClick={() => handleAcceptRequest(fromSeat)} 
+                                                <button
+                                                    onClick={() => handleAcceptRequest(fromSeat)}
                                                     style={styles.acceptButton}
                                                 >
                                                     Accept
                                                 </button>
-                                                <button 
+                                                <button
                                                     style={styles.declineButton}
                                                     onClick={() => {
                                                         setChatRequests(prev => prev.filter(seat => seat !== fromSeat));
@@ -260,24 +289,23 @@ const Moments = () => {
             {notification.show && (
                 <div style={{
                     ...styles.notification,
-                    backgroundColor: notification.type === "error" ? "#FEE2E2" : 
-                                     notification.type === "success" ? "#ECFDF5" : "#E0F2FE"
+                    backgroundColor: notification.type === "error" ? "#FEE2E2" :
+                        notification.type === "success" ? "#ECFDF5" : "#E0F2FE"
                 }}>
                     <span style={{
                         ...styles.notificationIcon,
-                        color: notification.type === "error" ? "#EF4444" : 
-                              notification.type === "success" ? "#10B981" : "#3B82F6"
+                        color: notification.type === "error" ? "#EF4444" :
+                            notification.type === "success" ? "#10B981" : "#3B82F6"
                     }}>
-                        {notification.type === "error" ? "❌" : 
-                         notification.type === "success" ? "✅" : "ℹ️"}
+                        {notification.type === "error" ? "❌" :
+                            notification.type === "success" ? "✅" : "ℹ️"}
                     </span>
                     <span style={styles.notificationText}>{notification.message}</span>
                 </div>
             )}
         </div>
     );
-};
-
+}
 // Enhanced Styles
 const styles = {
     pageContainer: {
@@ -288,43 +316,64 @@ const styles = {
     },
     header: {
         backgroundColor: "#FFFFFF",
-        padding: "1rem 2rem",
+        padding: "1rem",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         borderBottom: "1px solid #E5E7EB",
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+        '@media (min-width: 768px)': {
+            padding: "1rem 2rem",
+        },
     },
     logo: {
-        fontSize: "1.5rem",
+        fontSize: "1.25rem",
         fontWeight: "bold",
         color: "#1F2937",
         display: "flex",
         alignItems: "center",
         gap: "0.5rem",
+        '@media (min-width: 768px)': {
+            fontSize: "1.5rem",
+        },
     },
     userInfo: {
         display: "flex",
         alignItems: "center",
-        gap: "1rem",
+        gap: "0.5rem",
+        '@media (min-width: 768px)': {
+            gap: "1rem",
+        },
     },
     seatBadge: {
         backgroundColor: "#6D28D9",
         color: "white",
-        padding: "0.5rem 1rem",
+        padding: "0.25rem 0.75rem",
         borderRadius: "9999px",
         fontWeight: "medium",
-        fontSize: "0.875rem",
+        fontSize: "0.75rem",
+        '@media (min-width: 768px)': {
+            padding: "0.5rem 1rem",
+            fontSize: "0.875rem",
+        },
     },
     contentContainer: {
         display: "flex",
         flex: "1",
+        flexDirection: "column",
+        '@media (min-width: 768px)': {
+            flexDirection: "row",
+        },
     },
     sidebar: {
-        width: "240px",
-        backgroundColor: "#FFFFFF",
-        padding: "2rem 0",
-        borderRight: "1px solid #E5E7EB",
+        display: "none",
+        '@media (min-width: 768px)': {
+            display: "block",
+            width: "240px",
+            backgroundColor: "#FFFFFF",
+            padding: "2rem 0",
+            borderRight: "1px solid #E5E7EB",
+        },
     },
     sidebarItem: {
         display: "flex",
@@ -336,6 +385,12 @@ const styles = {
         position: "relative",
         fontSize: "1rem",
         transition: "background-color 0.2s, color 0.2s",
+    },
+    sidebarText: {
+        display: "inline",
+        '@media (min-width: 768px)': {
+            display: "inline",
+        },
     },
     activeSidebarItem: {
         backgroundColor: "#F3E8FF",
@@ -360,36 +415,113 @@ const styles = {
         justifyContent: "center",
         padding: "0 0.25rem",
     },
+    mobileNav: {
+        display: "flex",
+        justifyContent: "space-around",
+        alignItems: "center",
+        backgroundColor: "#FFFFFF",
+        borderTop: "1px solid #E5E7EB",
+        padding: "0.5rem 0",
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        '@media (min-width: 768px)': {
+            display: "none",
+        },
+    },
+    mobileNavItem: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0.5rem",
+        color: "#4B5563",
+        cursor: "pointer",
+        fontSize: "0.75rem",
+        position: "relative",
+        flex: 1,
+    },
+    activeMobileNavItem: {
+        color: "#6D28D9",
+    },
+    mobileNavIcon: {
+        fontSize: "1.25rem",
+        marginBottom: "0.25rem",
+    },
+    mobileNavText: {
+        fontSize: "0.75rem",
+    },
+    mobileBadgeCounter: {
+        position: "absolute",
+        top: "0.25rem",
+        right: "25%",
+        backgroundColor: "#EF4444",
+        color: "white",
+        borderRadius: "9999px",
+        fontSize: "0.625rem",
+        fontWeight: "bold",
+        minWidth: "1rem",
+        height: "1rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 0.125rem",
+    },
     mainContent: {
         flex: "1",
-        padding: "2rem",
+        padding: "1rem",
         backgroundColor: "#F9FAFB",
         overflowY: "auto",
+        marginBottom: "60px", // Space for mobile nav
+        '@media (min-width: 768px)': {
+            padding: "2rem",
+            marginBottom: 0,
+        },
     },
     heading: {
-        fontSize: "1.5rem",
+        fontSize: "1.25rem",
         fontWeight: "bold",
         color: "#1F2937",
         marginBottom: "0.5rem",
+        '@media (min-width: 768px)': {
+            fontSize: "1.5rem",
+        },
     },
     subtext: {
         color: "#6B7280",
-        marginBottom: "2rem",
+        marginBottom: "1.5rem",
+        fontSize: "0.875rem",
+        '@media (min-width: 768px)': {
+            marginBottom: "2rem",
+            fontSize: "1rem",
+        },
     },
     inputCardContainer: {
-        marginBottom: "2rem",
+        marginBottom: "1.5rem",
+        '@media (min-width: 768px)': {
+            marginBottom: "2rem",
+        },
     },
     inputCard: {
         backgroundColor: "#FFFFFF",
         borderRadius: "0.5rem",
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-        padding: "1.5rem",
+        padding: "1rem",
         display: "flex",
         alignItems: "center",
-        gap: "1.5rem",
+        gap: "1rem",
+        '@media (min-width: 768px)': {
+            padding: "1.5rem",
+            gap: "1.5rem",
+        },
     },
     cardIcon: {
-        fontSize: "2rem",
+        fontSize: "1.5rem",
+        '@media (min-width: 768px)': {
+            fontSize: "2rem",
+        },
     },
     cardContent: {
         flex: "1",
@@ -403,7 +535,11 @@ const styles = {
     },
     inputRow: {
         display: "flex",
+        flexDirection: "column",
         gap: "1rem",
+        '@media (min-width: 768px)': {
+            flexDirection: "row",
+        },
     },
     input: {
         flex: "1",
@@ -420,11 +556,16 @@ const styles = {
         color: "white",
         border: "none",
         borderRadius: "0.375rem",
-        padding: "0.75rem 1.5rem",
+        padding: "0.75rem 1rem",
         fontSize: "1rem",
         fontWeight: "500",
         cursor: "pointer",
         transition: "background-color 0.2s",
+        width: "100%",
+        '@media (min-width: 768px)': {
+            width: "auto",
+            padding: "0.75rem 1.5rem",
+        },
     },
     buttonDisabled: {
         backgroundColor: "#9CA3AF",
@@ -433,18 +574,29 @@ const styles = {
     infoSection: {
         backgroundColor: "#FFFFFF",
         borderRadius: "0.5rem",
-        padding: "1.5rem",
+        padding: "1rem",
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+        '@media (min-width: 768px)': {
+            padding: "1.5rem",
+        },
     },
     infoTitle: {
-        fontSize: "1.125rem",
+        fontSize: "1rem",
         fontWeight: "medium",
         color: "#1F2937",
         marginBottom: "1rem",
+        '@media (min-width: 768px)': {
+            fontSize: "1.125rem",
+        },
     },
     tipsList: {
-        paddingLeft: "1.5rem",
+        paddingLeft: "1rem",
         color: "#4B5563",
+        fontSize: "0.875rem",
+        '@media (min-width: 768px)': {
+            paddingLeft: "1.5rem",
+            fontSize: "1rem",
+        },
     },
     requestsList: {
         display: "flex",
@@ -455,10 +607,16 @@ const styles = {
         backgroundColor: "#FFFFFF",
         borderRadius: "0.5rem",
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-        padding: "1.5rem",
+        padding: "1rem",
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
+        flexDirection: "column",
+        gap: "1rem",
+        '@media (min-width: 768px)': {
+            padding: "1.5rem",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+        },
     },
     requestInfo: {
         display: "flex",
@@ -466,29 +624,42 @@ const styles = {
         gap: "1rem",
     },
     requestSeatIcon: {
-        fontSize: "1.5rem",
+        fontSize: "1.25rem",
         backgroundColor: "#F3E8FF",
         color: "#6D28D9",
-        width: "3rem",
-        height: "3rem",
+        width: "2.5rem",
+        height: "2.5rem",
         borderRadius: "50%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        '@media (min-width: 768px)': {
+            fontSize: "1.5rem",
+            width: "3rem",
+            height: "3rem",
+        },
     },
     requestSeatNumber: {
-        fontSize: "1.125rem",
+        fontSize: "1rem",
         fontWeight: "medium",
         color: "#1F2937",
         margin: "0 0 0.25rem 0",
+        '@media (min-width: 768px)': {
+            fontSize: "1.125rem",
+        },
     },
     requestText: {
         color: "#6B7280",
         margin: 0,
+        fontSize: "0.875rem",
+        '@media (min-width: 768px)': {
+            fontSize: "1rem",
+        },
     },
     requestActions: {
         display: "flex",
         gap: "0.75rem",
+        justifyContent: "flex-end",
     },
     acceptButton: {
         backgroundColor: "#6D28D9",
@@ -516,35 +687,55 @@ const styles = {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        padding: "3rem 0",
+        padding: "2rem 0",
         color: "#6B7280",
+        '@media (min-width: 768px)': {
+            padding: "3rem 0",
+        },
     },
     emptyIcon: {
-        fontSize: "3rem",
+        fontSize: "2.5rem",
         marginBottom: "1rem",
+        '@media (min-width: 768px)': {
+            fontSize: "3rem",
+        },
     },
     emptyText: {
-        fontSize: "1.125rem",
+        fontSize: "1rem",
         fontWeight: "medium",
         margin: "0 0 0.5rem 0",
+        '@media (min-width: 768px)': {
+            fontSize: "1.125rem",
+        },
     },
     emptySubtext: {
         color: "#9CA3AF",
         textAlign: "center",
         maxWidth: "300px",
+        fontSize: "0.875rem",
+        '@media (min-width: 768px)': {
+            fontSize: "1rem",
+        },
     },
     notification: {
         position: "fixed",
-        bottom: "2rem",
-        right: "2rem",
-        padding: "1rem 1.5rem",
+        bottom: "5rem",
+        left: "1rem",
+        right: "1rem",
+        padding: "1rem",
         borderRadius: "0.5rem",
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        maxWidth: "400px",
         zIndex: 100,
+        '@media (min-width: 768px)': {
+            bottom: "2rem",
+            left: "auto",
+            right: "2rem",
+            maxWidth: "400px",
+            padding: "1rem 1.5rem",
+        },
     },
     notificationIcon: {
         fontSize: "1.25rem",

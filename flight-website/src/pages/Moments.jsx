@@ -46,7 +46,7 @@ const Moments = () => {
     // Function to check if seat number exists in DB
     const checkSeatNumber = async (seat) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/users/check-seat/${seat}`);
+            const response = await fetch(`http://localhost:5000/api/passengers/check-seat/${seat}`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();

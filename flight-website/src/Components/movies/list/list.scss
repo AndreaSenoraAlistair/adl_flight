@@ -1,0 +1,62 @@
+.list {
+  width: 100%;
+  margin-top: 10px; /* Default margin for desktop */
+
+  .listTitle {
+      color: white;
+      font-size: 20px;
+      font-weight: 500;
+      margin-left: 50px;
+  }
+
+  .wrapper {
+      position: relative;
+
+      .sliderArrow {
+          width: 50px;
+          height: 100%;
+          background-color: rgba(22, 22, 22, 0.5);
+          color: white;
+          position: absolute;
+          z-index: 99;
+          top: 0;
+          bottom: 0;
+          margin: auto;
+          cursor: pointer;
+
+          &.left {
+              left: 0;
+          }
+
+          &.right {
+              right: 0;
+          }
+      }
+
+      .container {
+          margin-left: 50px;
+          display: flex;
+          margin-top: 10px; /* Default margin for desktop */
+          width: max-content;
+          transform: translateX(0px);
+          transition: all 1s ease;
+      }
+  }
+}
+
+/* Mobile-specific styles */
+@media screen and (max-width: 768px) {
+  .features-section {
+      margin-bottom: 5px; /* Reduce space after features section */
+      padding-bottom: 0;
+  }
+  
+  .list {
+      margin-top: 16px !important; /* Reduce space before list section */
+      padding-top: 0;
+  }
+
+  .listTitle {
+    font-size: 14px !important; /* Decrease font size for mobile */
+  }
+}

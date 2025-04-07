@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./Hero.css";
 
 const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStatus }) => {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const [showChat, setShowChat] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
@@ -14,65 +14,65 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
         seatNumber: ""
     });
     const messagesEndRef = useRef(null);
-    
+
     // Get passenger info from localStorage on component mount
     useEffect(() => {
         const storedName = localStorage.getItem("passengerName") || "Guest User";
         const storedSeat = localStorage.getItem("passengerSeat") || "---";
-        
+
         setPassengerInfo({
             name: storedName,
             seatNumber: storedSeat
         });
     }, []);
-    
+
     // Auto-scroll to bottom of chat
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
-    
+
     const sendMessage = async () => {
         if (!input.trim()) return;
-    
+
         const userMessage = { sender: "You", text: input };
         setMessages(prevMessages => [...prevMessages, userMessage]);
-        
+
         setInput("");
         setIsTyping(true);
-    
+
         try {
-            const response = await axios.post("http://localhost:5000/api/chat", { message: input });
+            const response = await axios.post("http://localhost:5000/api/chatbot/chatbot", { message: input });
             setIsTyping(false);
-            
+
             console.log("🔹 API Response:", response.data);
-    
-            const botMessage = { 
-                sender: "Bot", 
+
+            const botMessage = {
+                sender: "Bot",
                 text: response.data.reply || "No response from the bot."
             };
             setMessages(prevMessages => [...prevMessages, botMessage]);
         } catch (error) {
             setIsTyping(false);
             console.error("❌ Chatbot API Error:", error);
-            setMessages(prevMessages => [...prevMessages, { 
-                sender: "Bot", 
+            setMessages(prevMessages => [...prevMessages, {
+                sender: "Bot",
                 text: "Error connecting to chatbot."
             }]);
         }
     };
-    
+
     const handleKeyPress = (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
     };
-    
+
     const handleFeatureClick = (feature) => {
         // Handle feature card clicks
         console.log(`Feature clicked: ${feature}`);
         // You can add specific actions for each feature here
-        
+
         // Open chat with relevant query
         setShowChat(true);
         setInput(`Tell me about ${feature}`);
@@ -101,21 +101,21 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                     <div className="cloud-element cloud-2"></div>
                     <div className="cloud-element cloud-3"></div>
                 </div>
-                
+
                 <div className="hero-content">
                     <div className="hero-text">
                         <h1>{heroData.text1 || "Connect and"}</h1>
                         <p>{heroData.text2 || "share, even in the air."}</p>
-                        
+
                         <div className="hero-cta">
-                            <button 
+                            <button
                                 className="video-btn"
                                 onClick={() => setPlayStatus(!playStatus)}
                             >
                                 <span className="play-icon">▶</span> Watch Video
                             </button>
-                            
-                            <button 
+
+                            <button
                                 className="chatbot-btn"
                                 onClick={() => setShowChat(!showChat)}
                             >
@@ -125,11 +125,11 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                     </div>
                 </div>
             </div>
-            
+
             <div className="hero-features">
                 <h2>Your Perfect In-Flight Companion</h2>
                 <div className="features-grid">
-                    <button 
+                    <button
                         className="feature-card"
 
                         onClick={() => navigate('/home')}
@@ -138,8 +138,8 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                         <h3>In-Flight Dining</h3>
                         <p>Order gourmet meals from our curated menu</p>
                     </button>
-                    
-                    <button 
+
+                    <button
                         className="feature-card"
                         onClick={() => navigate('/moments')}
                     >
@@ -147,10 +147,10 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                         <h3>Stay Connected</h3>
                         <p>Chat with fellow passengers during your journey</p>
                     </button>
-                    
-                    <button 
+
+                    <button
                         className="feature-card"
-                        onClick={() => handleFeatureClick("Entertainment")}
+                        onClick={() => navigate('/movies')}
                     >
                         <div className="feature-icon">🎬</div>
                         <h3>Entertainment</h3>
@@ -158,17 +158,17 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                     </button>
                 </div>
             </div>
-            
+
             <div className="hero-explore">
                 <p>Explore the features</p>
             </div>
-            
+
             <div className="hero-navigation">
                 <ul className="hero-dots">
                     {[0, 1, 2].map(index => (
-                        <li 
+                        <li
                             key={index}
-                            onClick={() => setHeroCount(index)} 
+                            onClick={() => setHeroCount(index)}
                             className={`hero-dot ${heroCount === index ? 'active' : ''}`}
                         />
                     ))}
@@ -185,7 +185,7 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                         </div>
                         <button className="close-button" onClick={() => setShowChat(false)}>✖</button>
                     </div>
-                    
+
                     <div className="chat-body">
                         {messages.length === 0 && (
                             <div className="empty-chat">
@@ -195,8 +195,8 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                                 </div>
                                 <div className="suggestion-chips">
                                     {["In-flight Menu", "Entertainment", "Wi-Fi", "Flight Updates"].map((suggestion, i) => (
-                                        <button 
-                                            key={i} 
+                                        <button
+                                            key={i}
                                             className="suggestion-chip"
                                             onClick={() => setInput(`Tell me about ${suggestion}`)}
                                         >
@@ -206,22 +206,22 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                                 </div>
                             </div>
                         )}
-                        
+
                         {messages.map((msg, index) => (
-                            <div 
-                                key={index} 
+                            <div
+                                key={index}
                                 className={msg.sender === "You" ? "user-message" : "bot-message"}
                             >
                                 {msg.sender === "Bot" && <div className="bot-avatar">💬</div>}
                                 <div className="message-content">
                                     <div className="message-text">{msg.text}</div>
                                     <div className="message-time">
-                                        {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                        {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
                             </div>
                         ))}
-                        
+
                         {isTyping && (
                             <div className="bot-message">
                                 <div className="bot-avatar">💬</div>
@@ -232,19 +232,19 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
                                 </div>
                             </div>
                         )}
-                        
+
                         <div ref={messagesEndRef} />
                     </div>
-                    
+
                     <div className="chat-input">
-                        <input 
+                        <input
                             className="input-field"
-                            value={input} 
+                            value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            placeholder="Type your message here..." 
+                            placeholder="Type your message here..."
                         />
-                        <button 
+                        <button
                             className={`send-button ${input.trim() ? 'active' : ''}`}
                             onClick={sendMessage}
                             disabled={!input.trim()}

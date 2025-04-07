@@ -13,6 +13,10 @@ import Moments from "./pages/Moments";
 import Chatroom from "./pages/ChatRoom";
 import Home from "./pages/Home/Home";
 import Cart from "./pages/Cart/Cart";
+import MovieHome from "./pages/movies/moviehome/moviehome";
+import MovieRegister from "./pages/movies/register/Register";
+import MovieLogin from "./pages/movies/login/Login";
+import MovieWatch from "./pages/movies/watch/Watch";
 
 const App = () => {
   let heroData = [
@@ -83,7 +87,7 @@ const AppContent = ({
           {/* ✅ Show Flight Navbar & Background on Flight Home */}
           {location.pathname === "/" && (
             <>
-            {Hero}
+              {Hero}
               {/* <Background playStatus={playStatus} heroCount={heroCount} /> */}
               {/* <Navbar /> */}
             </>
@@ -116,6 +120,14 @@ const AppContent = ({
             />
             <Route path="/moments" element={<Moments seatNumber={seatNumber} />} />
             <Route path="/chatroom" element={<Chatroom seatNumber={seatNumber} />} />
+            <Route path="/movies" element={<MovieHome />} />
+            <Route path="/movies/movies" element={<MovieHome type="movie" />} />
+            <Route path="/movies/series" element={<MovieHome type="series" />} />
+
+
+            <Route path="/movies/register" element={<MovieRegister />} />
+            <Route path="/movies/login" element={<MovieLogin />} />
+            <Route path="/watch" element={<MovieWatch />} />
           </Routes>
 
           {/* ✅ Show Footer outside the wrapper for proper styling */}

@@ -7,7 +7,7 @@ const Navbar = () => {
             <div className="nav-logo">SkyConnect</div>
             <ul className="nav-menu">
                 <li><Link to="/home">Meals</Link></li> {/* ✅ Link to Meals Page */}
-                <li>Movies</li>
+                <li><Link to="/movies">Movies</Link></li>
                 <li><Link to="/moments">Moments</Link></li>
                 <li className='nav-home'><Link to="/">Home</Link></li>
             </ul>

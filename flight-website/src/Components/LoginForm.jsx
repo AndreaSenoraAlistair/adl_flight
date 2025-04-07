@@ -18,7 +18,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:5000/api/users/login", {
+            const response = await fetch("http://localhost:5000/api/passengers/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -51,19 +51,19 @@ const LoginForm = ({ setIsLoggedIn }) => {
     // Responsive page container style
     const pageContainerStyle = {
         ...getResponsiveStyle(
-            { 
-                display: "flex", 
-                flexDirection: "column", 
-                minHeight: "100vh", 
-                width: "100%", 
-                background: "#F9FAFB" 
+            {
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh",
+                width: "100%",
+                background: "#F9FAFB"
             },
-            { 
-                display: "flex", 
-                flexDirection: "row", 
-                minHeight: "100vh", 
-                width: "100%", 
-                backgroundColor: "#F9FAFB" 
+            {
+                display: "flex",
+                flexDirection: "row",
+                minHeight: "100vh",
+                width: "100%",
+                backgroundColor: "#F9FAFB"
             }
         )
     };
@@ -71,12 +71,12 @@ const LoginForm = ({ setIsLoggedIn }) => {
     // Responsive image container style
     const imageContainerStyle = {
         ...getResponsiveStyle(
-            { 
-                display: "none" 
+            {
+                display: "none"
             },
             {
                 flex: "1",
-                background:"url('/fallback.jpg')",
+                background: "url('/fallback.jpg')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 position: "relative",
@@ -147,32 +147,32 @@ const LoginForm = ({ setIsLoggedIn }) => {
                     <form onSubmit={handleSubmit} style={formStyle}>
                         <div style={inputGroupStyle}>
                             <label style={labelStyle}>Full Name</label>
-                            <input 
-                                type="text" 
-                                name="fullName" 
-                                value={formData.fullName} 
-                                onChange={handleChange} 
-                                required 
+                            <input
+                                type="text"
+                                name="fullName"
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                required
                                 style={{
                                     ...inputStyle,
                                     width: getResponsiveStyle("100%", "100%")
-                                }} 
+                                }}
                                 placeholder="Enter your full name"
                             />
                         </div>
 
                         <div style={inputGroupStyle}>
                             <label style={labelStyle}>Seat Number</label>
-                            <input 
-                                type="text" 
-                                name="seatNumber" 
-                                value={formData.seatNumber} 
-                                onChange={handleChange} 
-                                required 
+                            <input
+                                type="text"
+                                name="seatNumber"
+                                value={formData.seatNumber}
+                                onChange={handleChange}
+                                required
                                 style={{
                                     ...inputStyle,
                                     width: getResponsiveStyle("100%", "100%")
-                                }} 
+                                }}
                                 placeholder="e.g. 24A"
                             />
                         </div>
@@ -187,16 +187,16 @@ const LoginForm = ({ setIsLoggedIn }) => {
                                 marginBottom: getResponsiveStyle("1rem", "0")
                             }}>
                                 <label style={labelStyle}>From</label>
-                                <input 
-                                    type="text" 
-                                    name="source" 
-                                    value={formData.source} 
-                                    onChange={handleChange} 
-                                    required 
+                                <input
+                                    type="text"
+                                    name="source"
+                                    value={formData.source}
+                                    onChange={handleChange}
+                                    required
                                     style={{
                                         ...inputStyle,
                                         width: "100%"
-                                    }} 
+                                    }}
                                     placeholder="e.g. NYC"
                                 />
                             </div>
@@ -205,23 +205,23 @@ const LoginForm = ({ setIsLoggedIn }) => {
                                 width: getResponsiveStyle("100%", "50%")
                             }}>
                                 <label style={labelStyle}>To</label>
-                                <input 
-                                    type="text" 
-                                    name="destination" 
-                                    value={formData.destination} 
-                                    onChange={handleChange} 
-                                    required 
+                                <input
+                                    type="text"
+                                    name="destination"
+                                    value={formData.destination}
+                                    onChange={handleChange}
+                                    required
                                     style={{
                                         ...inputStyle,
                                         width: "100%"
-                                    }} 
+                                    }}
                                     placeholder="e.g. SFO"
                                 />
                             </div>
                         </div>
 
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             style={buttonStyle}
                             onMouseOver={(e) => e.target.style.backgroundColor = "#4C1D95"}
                             onMouseOut={(e) => e.target.style.backgroundColor = "#6D28D9"}

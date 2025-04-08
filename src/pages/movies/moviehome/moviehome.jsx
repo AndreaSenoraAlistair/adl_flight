@@ -9,17 +9,30 @@ const MovieHome = ({ type }) => {
   const [lists, setLists] = useState([]);
   const [genre, setGenre] = useState(null);
 
+  // Automatically switch base URL depending on environment
+  const API_BASE_URL = import.meta.env.PROD
+    ? "https://inlight-entertainment-backend.onrender.com"
+    : "http://localhost:5000";
+
   useEffect(() => {
     const getRandomLists = async () => {
       try {
-        console.log("Fetching data...");
-        const res = await axios.get(
-          `/api/lists/${type ? "?type=" + type : ""}${genre ? "&genre=" + genre : ""}`
-        );
+        let url = `${API_BASE_URL}/api/lists`;
+        const queryParams = [];
 
+        if (type) queryParams.push(`type=${type}`);
+        if (genre) queryParams.push(`genre=${genre}`);
+
+        if (queryParams.length > 0) {
+          url += `?${queryParams.join("&")}`;
+        }
+
+        console.log("📡 Fetching from URL:", url);
+
+        const res = await axios.get(url);
         setLists(res.data);
       } catch (err) {
-        console.error("Error fetching data:", err);
+        console.error("❌ Error fetching data:", err);
       }
     };
 

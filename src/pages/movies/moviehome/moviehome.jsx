@@ -9,12 +9,14 @@ export default function MovieHome({ type }) {
   const [lists, setLists] = useState([]);
   const [genre, setGenre] = useState(null);
 
-  // Hardcoded backend URL – all API calls will use this endpoint.
   const API_BASE_URL = "https://inlight-entertainment-backend.onrender.com";
 
   useEffect(() => {
     const getRandomLists = async () => {
       try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const TOKEN = user?.accessToken;
+
         let url = `${API_BASE_URL}/api/lists`;
         const queryParams = [];
 
@@ -26,7 +28,12 @@ export default function MovieHome({ type }) {
         }
 
         console.log("📡 Fetching from URL:", url);
-        const res = await axios.get(url);
+        const res = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+          },
+        });
+
         setLists(res.data);
       } catch (err) {
         console.error("❌ Error fetching data:", err);

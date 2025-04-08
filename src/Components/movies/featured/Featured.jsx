@@ -9,22 +9,30 @@ export default function Featured({ type, setGenre }) {
   const [content, setContent] = useState({});
   const navigate = useNavigate();
 
-  // Hardcoded backend URL—this forces API calls to hit your Render-hosted backend.
   const API_BASE_URL = "https://inlight-entertainment-backend.onrender.com";
 
   useEffect(() => {
     const getRandomContent = async () => {
       try {
-        // Only add the type query if `type` is defined.
+        const user = JSON.parse(localStorage.getItem("user"));
+        const TOKEN = user?.accessToken;
+
         const url = type
           ? `${API_BASE_URL}/api/movies/random?type=${type}`
           : `${API_BASE_URL}/api/movies/random`;
-        const res = await axios.get(url);
+
+        const res = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+          },
+        });
+
         setContent(res.data[0]);
       } catch (err) {
         console.error("❌ Error fetching random movie:", err);
       }
     };
+
     getRandomContent();
   }, [type]);
 

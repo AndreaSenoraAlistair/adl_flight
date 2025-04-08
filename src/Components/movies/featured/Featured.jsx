@@ -9,13 +9,21 @@ export default function Featured({ type, setGenre }) {
   const [content, setContent] = useState({});
   const navigate = useNavigate();
 
+  const API_BASE_URL = import.meta.env.PROD
+    ? "https://inlight-entertainment-backend.onrender.com"
+    : "http://localhost:5000";
+
   useEffect(() => {
     const getRandomContent = async () => {
       try {
-        const res = await axios.get(`/api/movies/random?type=${type}`);
+        let url = `${API_BASE_URL}/api/movies/random`;
+        if (type) {
+          url += `?type=${type}`;
+        }
+        const res = await axios.get(url);
         setContent(res.data[0]);
       } catch (err) {
-        console.log(err);
+        console.log("❌ Error fetching random movie:", err);
       }
     };
     getRandomContent();
@@ -44,7 +52,7 @@ export default function Featured({ type, setGenre }) {
         </div>
       )}
 
-      <img src={content.img} alt="" />
+      {content?.img && <img src={content.img} alt="featured content" />}
 
       <div className="info">
         <span className="desc">{content.desc}</span>

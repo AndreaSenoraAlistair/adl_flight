@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:5000", // or 5000 depending on your backend
+        target: "https://inlight-entertainment-backend.onrender.com", // or 5000 depending on your backend
         changeOrigin: true,
         secure: false,
       },

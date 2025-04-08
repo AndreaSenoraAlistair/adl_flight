@@ -148,14 +148,14 @@ const Moments = () => {
                             <span style={styles.badgeCounter}>{chatRequests.length}</span>
                         )}
                     </div>
-                    <div style={styles.sidebarItem}>
+                    {/* <div style={styles.sidebarItem}>
                         <span style={styles.sidebarIcon}>👥</span>
                         <span style={styles.sidebarText}>Activities</span>
                     </div>
                     <div style={styles.sidebarItem}>
                         <span style={styles.sidebarIcon}>⚙️</span>
                         <span style={styles.sidebarText}>Settings</span>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Mobile Bottom Navigation */}
@@ -177,14 +177,14 @@ const Moments = () => {
                         )}
                         <span style={styles.mobileNavText}>Requests</span>
                     </div>
-                    <div style={styles.mobileNavItem}>
+                    {/* <div style={styles.mobileNavItem}>
                         <span style={styles.mobileNavIcon}>👥</span>
                         <span style={styles.mobileNavText}>Activities</span>
                     </div>
                     <div style={styles.mobileNavItem}>
                         <span style={styles.mobileNavIcon}>⚙️</span>
                         <span style={styles.mobileNavText}>Settings</span>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Main Area */}

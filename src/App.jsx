@@ -11,7 +11,7 @@ import Hero from "./Components/Hero/Hero";
 import Login from "./Components/LoginForm";
 import Moments from "./pages/Moments";
 import Chatroom from "./pages/ChatRoom";
-import Home from "./pages/Home/Home";
+import Home from "./pages/home/Home";
 import Cart from "./pages/Cart/Cart";
 import MovieHome from "./pages/movies/moviehome/moviehome";
 import MovieRegister from "./pages/movies/register/Register";

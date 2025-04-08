@@ -10,9 +10,8 @@ const MovieHome = ({ type }) => {
   const [genre, setGenre] = useState(null);
 
   // Automatically switch base URL depending on environment
-  const API_BASE_URL = import.meta.env.PROD
-    ? "https://inlight-entertainment-backend.onrender.com"
-    : "http://localhost:5000";
+  const API_BASE_URL = "https://inlight-entertainment-backend.onrender.com"
+
 
   useEffect(() => {
     const getRandomLists = async () => {

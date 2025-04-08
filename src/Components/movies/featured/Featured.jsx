@@ -9,17 +9,16 @@ export default function Featured({ type, setGenre }) {
   const [content, setContent] = useState({});
   const navigate = useNavigate();
 
-  const API_BASE_URL = import.meta.env.PROD
-    ? "https://inlight-entertainment-backend.onrender.com"
-    : "http://localhost:5000";
+  // Hardcoded backend URL
+  const API_BASE_URL = "https://inlight-entertainment-backend.onrender.com";
 
   useEffect(() => {
     const getRandomContent = async () => {
       try {
-        let url = `${API_BASE_URL}/api/movies/random`;
-        if (type) {
-          url += `?type=${type}`;
-        }
+        // Only add type if it is defined to avoid ?type=undefined in URL
+        const url = type
+          ? `${API_BASE_URL}/api/movies/random?type=${type}`
+          : `${API_BASE_URL}/api/movies/random`;
         const res = await axios.get(url);
         setContent(res.data[0]);
       } catch (err) {
@@ -29,7 +28,14 @@ export default function Featured({ type, setGenre }) {
     getRandomContent();
   }, [type]);
 
-  const movieGenres = ["Adventure", "Comedy", "Crime", "Fantasy", "Horror", "Thriller"];
+  const movieGenres = [
+    "Adventure",
+    "Comedy",
+    "Crime",
+    "Fantasy",
+    "Horror",
+    "Thriller",
+  ];
   const seriesGenres = ["Adventure", "Thriller", "Crime"];
 
   return (
@@ -52,7 +58,7 @@ export default function Featured({ type, setGenre }) {
         </div>
       )}
 
-      {content?.img && <img src={content.img} alt="featured content" />}
+      {content.img && <img src={content.img} alt="featured content" />}
 
       <div className="info">
         <span className="desc">{content.desc}</span>

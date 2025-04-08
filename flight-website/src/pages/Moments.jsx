@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://inlight-entertainment-backend.onrender.com");
 
 const Moments = () => {
     const navigate = useNavigate();
@@ -46,7 +46,7 @@ const Moments = () => {
     // Function to check if seat number exists in DB
     const checkSeatNumber = async (seat) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/passengers/check-seat/${seat}`);
+            const response = await fetch(`https://inlight-entertainment-backend.onrender.com/api/passengers/check-seat/${seat}`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
@@ -86,7 +86,7 @@ const Moments = () => {
 
         // Send chat request to backend for storage
         try {
-            await fetch("http://localhost:5000/api/chat/send-request", {
+            await fetch("https://inlight-entertainment-backend.onrender.com/api/chat/send-request", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(chatRequestData),
@@ -107,7 +107,7 @@ const Moments = () => {
         socket.emit("accept_chat_request", { fromSeat, toSeat: seatNumber });
 
         // Update backend chat request status
-        await fetch("http://localhost:5000/api/chat/accept-request", {
+        await fetch("https://inlight-entertainment-backend.onrender.com/api/chat/accept-request", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ fromSeat, toSeat: seatNumber }),

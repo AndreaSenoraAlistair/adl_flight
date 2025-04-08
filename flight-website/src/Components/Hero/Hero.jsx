@@ -41,7 +41,7 @@ const FlightHome = ({ heroData, setHeroCount, heroCount, setPlayStatus, playStat
         setIsTyping(true);
 
         try {
-            const response = await axios.post("http://localhost:5000/api/chatbot/chatbot", { message: input });
+            const response = await axios.post("https://inlight-entertainment-backend.onrender.com/api/chatbot/chatbot", { message: input });
             setIsTyping(false);
 
             console.log("🔹 API Response:", response.data);

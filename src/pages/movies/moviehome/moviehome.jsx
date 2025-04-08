@@ -5,13 +5,12 @@ import List from "../../../Components/movies/list/List";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const MovieHome = ({ type }) => {
+export default function MovieHome({ type }) {
   const [lists, setLists] = useState([]);
   const [genre, setGenre] = useState(null);
 
-  // Automatically switch base URL depending on environment
-  const API_BASE_URL = "https://inlight-entertainment-backend.onrender.com"
-
+  // Hardcoded backend URL – all API calls will use this endpoint.
+  const API_BASE_URL = "https://inlight-entertainment-backend.onrender.com";
 
   useEffect(() => {
     const getRandomLists = async () => {
@@ -27,7 +26,6 @@ const MovieHome = ({ type }) => {
         }
 
         console.log("📡 Fetching from URL:", url);
-
         const res = await axios.get(url);
         setLists(res.data);
       } catch (err) {
@@ -47,6 +45,4 @@ const MovieHome = ({ type }) => {
       ))}
     </div>
   );
-};
-
-export default MovieHome;
+}

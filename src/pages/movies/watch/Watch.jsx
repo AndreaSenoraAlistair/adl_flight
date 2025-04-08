@@ -9,6 +9,8 @@ export default function Watch() {
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
 
+  const API_BASE_URL = "https://inlight-entertainment-backend.onrender.com";
+
   useEffect(() => {
     const fetchMovie = async () => {
       try {
@@ -18,10 +20,18 @@ export default function Watch() {
           return;
         }
 
-        const res = await axios.get(`/api/movies/find/${movieId}`);
+        const user = JSON.parse(localStorage.getItem("user"));
+        const TOKEN = user?.accessToken;
+
+        const res = await axios.get(`${API_BASE_URL}/api/movies/find/${movieId}`, {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+          },
+        });
+
         setMovie(res.data);
       } catch (err) {
-        console.error("Error fetching movie:", err);
+        console.error("❌ Error fetching movie:", err);
       }
     };
 

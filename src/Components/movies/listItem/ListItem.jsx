@@ -11,23 +11,40 @@ export default function ListItem({ index, item }) {
   const [isHovered, setIsHovered] = useState(false);
   const [movie, setMovie] = useState(null);
 
+  // ✅ Backend URL
+  const API_BASE_URL = "https://inlight-entertainment-backend.onrender.com";
+
   useEffect(() => {
     const getMovie = async () => {
       try {
-        const res = await axios.get(`/api/movies/find/${item}`);
+        const user = JSON.parse(localStorage.getItem("user"));
+        const TOKEN = user?.accessToken;
+
+        const res = await axios.get(`${API_BASE_URL}/api/movies/find/${item}`, {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+          },
+        });
+
         setMovie(res.data);
       } catch (err) {
-        console.error("Error fetching movie:", err);
+        console.error("❌ Error fetching movie:", err);
       }
     };
+
     getMovie();
   }, [item]);
 
   return (
-    <Link to={movie ? "/watch" : "#"} state={movie ? { movieId: movie._id } : null}>
+    <Link
+      to={movie ? "/watch" : "#"}
+      state={movie ? { movieId: movie._id } : null}
+    >
       <div
         className="listItem"
-        style={{ left: isHovered ? index * 225 - 50 + index * 2.5 : "auto" }}
+        style={{
+          left: isHovered ? index * 225 - 50 + index * 2.5 : "auto",
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -36,7 +53,7 @@ export default function ListItem({ index, item }) {
             <img src={movie.imgSm} alt={movie.title || "Movie"} />
             {isHovered && (
               <>
-                <video src={movie.trailer} autoPlay loop />
+                <video src={movie.trailer} autoPlay loop muted />
                 <div className="itemInfo">
                   <div className="icons">
                     <PlayArrowIcon className="icon" />
